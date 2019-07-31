@@ -4,6 +4,7 @@ from datetime import datetime
 from algernon import ajson
 from algernon.aws import Bullhorn
 
+from toll_booth.obj.troubles import EmptyParserResponseException
 from toll_booth.tasks.aws_tasks import s3_tasks
 from toll_booth.obj.gql.gql_client import GqlClient
 from toll_booth.tasks import parsers
@@ -137,7 +138,7 @@ def parse_documentation(encounter_internal_id):
     parser = getattr(parsers, parser_name)
     parser_results, parser_id = parser(documentation)
     if not parser_results:
-        raise RuntimeError(f'could not parse anything for encounter: {encounter_internal_id}, with parser: {parser_id}')
+        raise EmptyParserResponseException(parser_id, encounter_internal_id)
     # _publish_results(encounter_id, parser_id, id_source, parser_results)
     organized_results = _organize_results(encounter_id, id_source, parser_id, parser_results)
     return organized_results
