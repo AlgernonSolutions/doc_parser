@@ -31,7 +31,6 @@ def _send_to_fire_hose(stream_name, records):
         raise RuntimeError(f'could not fire_hose these records: {failed_records}')
 
 
-@lambda_logged
 def fire_hose_documentation(event, context):
     stream_name = os.environ['S3_FIRE_HOSE_NAME']
     event = rebuild_event(event)
