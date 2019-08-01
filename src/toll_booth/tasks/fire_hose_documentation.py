@@ -31,8 +31,8 @@ def _send_to_fire_hose(stream_name, records):
         raise RuntimeError(f'could not fire_hose these records: {failed_records}')
 
 
-def fire_hose_documentation(event, context):
+def fire_hose_documentation(**kwargs):
+    extracted_data = kwargs['extracted_data']
     stream_name = os.environ['S3_FIRE_HOSE_NAME']
-    event = rebuild_event(event)
-    extracted_data = event['extracted_data']
+    extracted_data = rebuild_event(extracted_data)
     _send_to_fire_hose(stream_name, [extracted_data])
