@@ -3,6 +3,7 @@ from datetime import datetime
 
 import bs4
 from algernon.aws import StoredData
+from algernon import ajson
 
 from toll_booth.tasks.retrieve_documentation import retrieve_documentation
 
@@ -26,4 +27,4 @@ def distill_documentation(encounter_internal_id):
         }
     }
     stored_data = StoredData.from_object(uuid.uuid4(), extracted_data, full_unpack=True)
-    return stored_data
+    return ajson.dumps(stored_data)
