@@ -4,7 +4,7 @@ import os
 import boto3
 from algernon.aws import lambda_logged
 
-from toll_booth.tasks.parse_documentation import parse_documentation
+from toll_booth import tasks
 
 
 def _load_config(variable_names):
@@ -17,10 +17,12 @@ def _load_config(variable_names):
 
 @lambda_logged
 def handler(event, context):
-    logging.info(f'received a call to run a documentation_parser: {event}/{context}')
+    logging.info(f'received a call to run a parser: {event}/{context}')
     variable_names = ['GRAPH_GQL_ENDPOINT']
     _load_config(variable_names)
-    encounter_internal_id = event['encounter_internal_id']
-    results = parse_documentation(encounter_internal_id)
-    logging.info(f'completed a call to the documentation_parser: {event}/{results}')
+    parse_type = event['parse_type']
+    parse_kwargs = event['parse_kwargs']
+    operation = getattr(tasks, f'{parse_type}_documentation')
+    results = operation(**parse_kwargs)
+    logging.info(f'completed a call to the parser: {event}/{results}')
     return results

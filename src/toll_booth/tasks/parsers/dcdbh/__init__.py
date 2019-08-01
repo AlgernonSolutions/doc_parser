@@ -1,5 +1,6 @@
 import bs4
 
+from toll_booth.obj.credibles.credible_form import CredibleFormExtraction, CredibleForm
 from toll_booth.tasks.parsers.dcdbh.split_header import _split_header
 from toll_booth.tasks.parsers.dcdbh.tx_plan import _parse_tx_plans
 
@@ -103,10 +104,16 @@ def _generate_documentation_id(tx_plus_documentation):
 
 def parser(documentation):
     results = {}
+    form_extraction = CredibleFormExtraction.from_raw_html(documentation)
+    pieces = form_extraction.identified_pieces
+    form = CredibleForm.from_extracted_pieces(pieces)
+    note_body = form.note_body
+    hydrate = note_body.rehydrate()
     soup = _make_tasty_soup(documentation)
     note_body = _find_note_body(soup)
     note_header, note_form = _split_header(note_body)
     tx_plus = _split_tx_plus(soup)
+    raw_strings = ' '.join([x for x in soup.strings])
     if tx_plus:
         for plan in tx_plus:
             tx_plus_documentation = _parse_tx_plans(plan)
@@ -126,4 +133,8 @@ def parser(documentation):
         patient_response = _check_for_patient_response(pieces)
         if patient_response:
             results['patient_response'] = patient_response
+    if hydrate:
+        results['note_body'] = hydrate
+    if raw_strings:
+        results['strings'] = raw_strings
     return results, 'credible_parser.v1'

@@ -8,6 +8,7 @@ from toll_booth.obj.troubles import EmptyParserResponseException
 from toll_booth.tasks.aws_tasks import s3_tasks
 from toll_booth.obj.gql.gql_client import GqlClient
 from toll_booth.tasks import parsers
+from toll_booth.tasks.retrieve_documentation import retrieve_documentation
 
 documentation_map = {
     'PSI': 'dcdbh',
@@ -125,13 +126,10 @@ def _organize_results(encounter_id, id_source, parser_id, parser_results):
 
 
 def parse_documentation(encounter_internal_id):
-    gql_endpoint = os.environ['GRAPH_GQL_ENDPOINT']
-    client = GqlClient.from_gql_endpoint(gql_endpoint)
-    documentation_property = client.get_documentation_property(encounter_internal_id)
-    documentation_uri = documentation_property['documentation']['storage_uri']
-    documentation = s3_tasks.retrieve_s3_property(documentation_uri)
-    id_source = documentation_property['id_source']['property_value']
-    encounter_id = documentation_property['encounter_id']['property_value']
+    documentation_data = retrieve_documentation(encounter_internal_id)
+    id_source = documentation_data['id_source']
+    documentation = documentation_data['documentation']
+    encounter_id = documentation_data['encounter_id']
     parser_name = id_source
     if id_source in documentation_map:
         parser_name = documentation_map[id_source]
@@ -139,6 +137,5 @@ def parse_documentation(encounter_internal_id):
     parser_results, parser_id = parser(documentation)
     if not parser_results:
         raise EmptyParserResponseException(parser_id, encounter_internal_id)
-    # _publish_results(encounter_id, parser_id, id_source, parser_results)
     organized_results = _organize_results(encounter_id, id_source, parser_id, parser_results)
     return organized_results
