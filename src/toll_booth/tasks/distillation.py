@@ -19,12 +19,16 @@ def distill_documentation(encounter_internal_id):
     documentation = documentation_data['documentation']
     distilled_text = _distill_strings(documentation)
     extracted_data = {
-        'source': {
-            'id_source': id_source,
-            'encounter_id': documentation_data['encounter_id'],
-            'utc_generated_datetime': datetime.utcnow().isoformat(),
-            'documentation_text': distilled_text
+        'object_type': 'DocumentationText',
+        'extracted_data': {
+            'source': {
+                'id_source': id_source,
+                'encounter_id': documentation_data['encounter_id'],
+                'utc_generated_datetime': datetime.utcnow().isoformat(),
+                'documentation_text': distilled_text
+            }
         }
+
     }
     stored_data = StoredData.from_object(uuid.uuid4(), extracted_data, full_unpack=True)
     return ajson.dumps(stored_data)
