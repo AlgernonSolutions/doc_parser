@@ -7,7 +7,7 @@ import pytest
 
 @pytest.fixture
 def task_event():
-    return _read_test_event('event')
+    return _read_test_event('rds_event')
 
 
 @pytest.fixture

@@ -1,6 +1,9 @@
 import json
 import os
 
+import rapidjson
+from algernon import rebuild_event
+
 from toll_booth.obj.gql.gql_client import GqlClient
 from toll_booth.obj.rds import SqlDriver, DocumentationTextEntry
 
@@ -34,6 +37,7 @@ def _find_encounter_property(property_name, encounter_properties):
 def rds_documentation(encounter, documentation_text, sql_driver=None):
     if not sql_driver:
         sql_driver = _build_sql_driver()
+    documentation_text = rebuild_event(rapidjson.loads(documentation_text))
     encounter_properties = encounter['vertex_properties']['local_properties']
     patient_id_value = _find_encounter_property('patient_id', encounter_properties)
     provider_id_value = _find_encounter_property('provider_id', encounter_properties)
