@@ -2,6 +2,7 @@ import logging
 import os
 
 import boto3
+from algernon import rebuild_event
 from algernon.aws import lambda_logged
 
 from toll_booth import tasks
@@ -19,6 +20,7 @@ def _load_config(variable_names):
 def handler(event, context):
     logging.info(f'received a call to run a parser: {event}/{context}')
     variable_names = ['GRAPH_GQL_ENDPOINT', 'S3_FIRE_HOSE_NAME']
+    event = rebuild_event(event)
     _load_config(variable_names)
     parse_type = event['parse_type']
     parse_kwargs = event['parse_kwargs']
