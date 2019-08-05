@@ -2,6 +2,14 @@ AWSTemplateFormatVersion: 2010-09-09
 Transform:
 - AWS::Serverless-2016-10-31
 
+Parameters:
+  NeptuneSecurityGroupIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: A collection of Security Group IDs capable of interacting with the Neptune Cluster
+  NeptuneSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: A collection of Subnet IDs which can interact with the Neptune Cluster
+
 Resources:
   Task:
     Type: AWS::Serverless::Function
@@ -11,3 +19,14 @@ Resources:
       Tracing: Active
       CodeUri: src/
       Role: !ImportValue dev-worker-role-arn
+  VpcTask:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: toll_booth.handler
+      Runtime: python3.7
+      Tracing: Active
+      CodeUri: src/
+      Role: !ImportValue dev-worker-role-arn
+      VpcConfig:
+        SecurityGroupIds: !Ref NeptuneSecurityGroupIds
+        SubnetIds: !Ref NeptuneSubnetIds
