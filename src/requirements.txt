@@ -2,4 +2,4 @@ bs4
 jsonpath_rw
 moncrief
 lxml
-mysql-connector-python
+PyMySQL
