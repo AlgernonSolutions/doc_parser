@@ -1,5 +1,5 @@
 from algernon.aws import Opossum
-from mysql import connector
+from pymysql import connect
 
 
 class DocumentationTextEntry:
@@ -92,7 +92,7 @@ class SqlDriver:
         return cls(sql_host, sql_port, db_name, credentials['username'], credentials['password'])
 
     def __enter__(self):
-        self._connection = connector.connect(
+        self._connection = connect(
             host=self._sql_host,
             port=self._sql_port,
             database=self._db_name,
