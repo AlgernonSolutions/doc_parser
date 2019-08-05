@@ -10,7 +10,7 @@ import rapidjson
 from algernon.serializers import ExplosionJson
 
 from toll_booth.obj.rds import SqlDriver
-from toll_booth.tasks import rds_documentation_text
+from toll_booth.tasks import rds_documentation
 
 
 class FireHoseEncoder(json.JSONEncoder):
@@ -87,7 +87,7 @@ def _put_documentation_text(sql_host, queue):
         task = queue.get()
         if task is None:
             return
-        rds_documentation_text(**task, sql_driver=driver)
+        rds_documentation(**task, sql_driver=driver)
         queue.task_done()
         print(queue.qsize())
 

@@ -31,7 +31,7 @@ def _find_encounter_property(property_name, encounter_properties):
     raise KeyError(property_name)
 
 
-def rds_documentation_text(encounter, documentation_text, sql_driver=None):
+def rds_documentation(encounter, documentation_text, sql_driver=None):
     if not sql_driver:
         sql_driver = _build_sql_driver()
     encounter_properties = encounter['vertex_properties']['local_properties']

@@ -4,7 +4,7 @@ import pytest
 import rapidjson
 from algernon import rebuild_event
 
-from toll_booth.tasks.rds_documentation_text import rds_documentation_text
+from toll_booth.tasks.rds_documentation import rds_documentation
 
 
 class TestPutDocumentation:
@@ -17,5 +17,5 @@ class TestPutDocumentation:
         documentation_text = rapidjson.loads(test_documentation['documentation_text'])
         documentation_text = rebuild_event(documentation_text)
         encounter = test_documentation['encounter']
-        results = rds_documentation_text(encounter, documentation_text)
+        results = rds_documentation(encounter, documentation_text)
         assert results is None
