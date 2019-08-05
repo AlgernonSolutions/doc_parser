@@ -160,3 +160,27 @@ GET_PROVIDER_ENCOUNTER_COUNT = """
         }
     }
 """
+
+GET_INTERNAL_ID = """
+    query internal_ids($identifier_stem: String!, $sid_value: String!){
+        get_vertex(identifier_stem: $identifier_stem, sid_value: $sid_value){
+            internal_id
+        }
+    }
+"""
+
+GET_ENCOUNTER = """
+    query get_encounter($identifier_stem: String!, $sid_value: String!){
+        get_vertex(identifier_stem: $identifier_stem, sid_value: $sid_value){
+            internal_id
+            vertex_properties{
+                property_name
+                property_value {
+                    ... on LocalPropertyValue{
+                        property_value
+                    }
+                }
+            }
+        }
+    }
+"""

@@ -179,3 +179,17 @@ class GqlClient:
             ][0],
         }
         return filtered_properties
+
+    def get_internal_id(self, identifier_stem, id_value):
+        variables = {
+            'identifier_stem': identifier_stem,
+            'sid_value': str(id_value)
+        }
+        response = self._send(gql_queries.GET_INTERNAL_ID, variables)
+        internal_id = response['data']['get_vertex']['internal_id']
+        return internal_id
+
+    def get_encounter_data(self, identifier_stem, sid_value):
+        variables = {'identifier_stem': identifier_stem, 'sid_value': sid_value}
+        results = self._send(gql_queries.GET_ENCOUNTER, variables=variables)
+        return results
