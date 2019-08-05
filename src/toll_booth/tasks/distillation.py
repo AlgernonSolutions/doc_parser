@@ -17,13 +17,16 @@ def distill_documentation(encounter_internal_id):
     documentation_data = retrieve_documentation(encounter_internal_id)
     id_source = documentation_data['id_source']
     documentation = documentation_data['documentation']
+    encounter_id = documentation_data['encounter_id']
     distilled_text = _distill_strings(documentation)
     extracted_data = {
         'object_type': 'DocumentationText',
+        'identifier': f'#{id_source}#Encounter#',
+        'id_value': encounter_id,
         'extracted_data': {
             'source': {
                 'id_source': id_source,
-                'encounter_id': documentation_data['encounter_id'],
+                'encounter_id': encounter_id,
                 'utc_generated_datetime': datetime.utcnow().isoformat(),
                 'documentation_text': distilled_text
             }

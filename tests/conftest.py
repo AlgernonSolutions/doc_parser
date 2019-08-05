@@ -5,6 +5,11 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 
+@pytest.fixture
+def task_event():
+    return _read_test_event('event')
+
+
 @pytest.fixture(autouse=True)
 def silence_x_ray():
     x_ray_patch_all = 'algernon.aws.lambda_logging.patch_all'
