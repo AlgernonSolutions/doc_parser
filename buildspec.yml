@@ -10,7 +10,7 @@ phases:
       - pip install --upgrade pip
       - pip install --upgrade awscli
       - pip install --upgrade aws-sam-cli
-      - sam build -b .aws-sam/build
+      - sam build --debug -b .aws-sam/build
       - sam package --s3-bucket $S3_BUCKET --template-file .aws-sam/build/template.yaml --output-template-file template-export.yml
 
 artifacts:
