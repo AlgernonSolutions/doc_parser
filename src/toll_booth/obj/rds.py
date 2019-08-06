@@ -1,5 +1,20 @@
 from algernon.aws import Opossum
-from pymysql import connect
+from pymysql import connect, IntegrityError
+
+
+class IndexViolationException(Exception):
+    def __init__(self, index_name, key_value):
+        self._index_name = index_name
+        self._key_value = key_value
+
+    @classmethod
+    def from_integrity_error(cls, error):
+        error_msg = error.args[1]
+        error_msg = error_msg.replace('Duplicate entry ', '')
+        error_msg = error_msg.replace(' for key ', '!')
+        error_msg = error_msg.replace("'", '')
+        pieces = error_msg.split('!')
+        return cls(pieces[1], pieces[0])
 
 
 class DocumentationTextEntry:
@@ -109,7 +124,7 @@ class SqlDriver:
             self._cursor = None
             self._connection = None
             return True
-        raise Exception(exc_val)
+        raise exc_val
 
     def put_documentation(self, documentation_text_entry: DocumentationTextEntry):
         if self._cursor is None:
@@ -120,8 +135,13 @@ class SqlDriver:
                   '(%(encounter_internal_id)s, %(encounter_type)s, %(id_source)s, %(documentation_text)s, ' \
                   '%(provider_internal_id)s, %(patient_internal_id)s, %(provider_id_value)s, %(patient_id_value)s, ' \
                   '%(encounter_id_value)s)'
-        results = self._cursor.execute(command, documentation_text_entry.for_rds_insertion)
-        self._connection.commit()
+        try:
+            results = self._cursor.execute(command, documentation_text_entry.for_rds_insertion)
+            self._connection.commit()
+        except IntegrityError as e:
+            if e.args[0] != 1062:
+                raise e
+            raise IndexViolationException.from_integrity_error(e)
         return results
 
     def retrieve_documentation(self, encounter_internal_id: str):
