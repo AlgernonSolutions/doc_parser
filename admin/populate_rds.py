@@ -61,6 +61,7 @@ def _scan_dynamo(table_name, segment, total_segments, queue):
             encounter = {
                     'internal_id': item['internal_id'],
                     'id_value': item['id_value']['property_value'],
+                    'vertex_type': item['object_type'],
                     'identifier_stem': {
                         'property_value': item['identifier_stem'],
                         'property_name': 'identifier_stem',

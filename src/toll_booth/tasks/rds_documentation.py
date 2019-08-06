@@ -1,5 +1,6 @@
 import logging
 import os
+from decimal import Decimal
 
 import boto3
 import rapidjson
@@ -18,8 +19,9 @@ def _build_sql_driver():
 
 
 def _retrieve_internal_id(identifier_stem, id_value, table_resource):
+    sid_value = str(int(id_value))
     response = table_resource.query(
-        KeyConditionExpression=Key('identifier_stem').eq(identifier_stem) & Key('sid_value').eq(str(id_value)),
+        KeyConditionExpression=Key('identifier_stem').eq(identifier_stem) & Key('sid_value').eq(sid_value),
         ProjectionExpression='internal_id'
     )
     for entry in response['Items']:
@@ -40,7 +42,7 @@ def _resolve_internal_ids(identifier_stem, provider_id_value, patient_id_value):
 def _find_encounter_property(property_name, encounter_properties):
     for encounter_property in encounter_properties:
         if property_name == encounter_property['property_name']:
-            return encounter_property['property_value']
+            return encounter_property['property_value']['property_value']
     raise KeyError(property_name)
 
 

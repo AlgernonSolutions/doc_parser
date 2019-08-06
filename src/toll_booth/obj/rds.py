@@ -136,7 +136,8 @@ class SqlDriver:
                   '%(provider_internal_id)s, %(patient_internal_id)s, %(provider_id_value)s, %(patient_id_value)s, ' \
                   '%(encounter_id_value)s)'
         try:
-            results = self._cursor.execute(command, documentation_text_entry.for_rds_insertion)
+            params = documentation_text_entry.for_rds_insertion
+            results = self._cursor.execute(command, params)
             self._connection.commit()
         except IntegrityError as e:
             if e.args[0] != 1062:
