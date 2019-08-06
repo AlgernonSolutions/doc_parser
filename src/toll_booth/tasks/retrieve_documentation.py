@@ -8,6 +8,8 @@ def retrieve_documentation(encounter_internal_id):
     gql_endpoint = os.environ['GRAPH_GQL_ENDPOINT']
     client = GqlClient.from_gql_endpoint(gql_endpoint)
     documentation_property = client.get_documentation_property(encounter_internal_id)
+    if not documentation_property:
+        raise RuntimeError(f'encounter with internal_id: {encounter_internal_id} has no documentation stored for it')
     documentation_uri = documentation_property['documentation']['storage_uri']
     documentation = s3_tasks.retrieve_s3_property(documentation_uri)
     id_source = documentation_property['id_source']['property_value']
