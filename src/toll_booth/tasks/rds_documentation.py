@@ -1,3 +1,4 @@
+import logging
 import os
 
 import boto3
@@ -47,11 +48,14 @@ def rds_documentation(encounter, documentation_text, sql_driver=None):
     if not sql_driver:
         sql_driver = _build_sql_driver()
     documentation_text = rebuild_event(rapidjson.loads(documentation_text))
+    logging.debug(f'after rebuilding, documentation_text is {documentation_text}')
     encounter_properties = encounter['vertex_properties']['local_properties']
     patient_id_value = _find_encounter_property('patient_id', encounter_properties)
     provider_id_value = _find_encounter_property('provider_id', encounter_properties)
     identifier_stem = encounter['identifier_stem']['property_value']
+    logging.debug(f'going to resolve the provider and patient internal_id values')
     provider_internal_id, patient_internal_id = _resolve_internal_ids(identifier_stem, provider_id_value, patient_id_value)
+    logging.debug(f'resolved values are provider: {provider_internal_id}, patient: {patient_internal_id}')
     entry_kwargs = {
         'encounter_internal_id': encounter['internal_id'],
         'encounter_type': _find_encounter_property('encounter_type', encounter_properties),
@@ -65,4 +69,6 @@ def rds_documentation(encounter, documentation_text, sql_driver=None):
     }
     text_entry = DocumentationTextEntry(**entry_kwargs)
     with sql_driver as driver:
+        logging.debug(f'going to push the created documentation entry: {entry_kwargs} to the database')
         driver.put_documentation(text_entry)
+    logging.debug(f'successfully pushed the documentation to the database')
