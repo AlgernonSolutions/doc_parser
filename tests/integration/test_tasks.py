@@ -11,5 +11,6 @@ class TestParsers:
         os.environ['ALGERNON_BUCKET_NAME'] = 'algernonsolutions-leech-dev'
         os.environ['RDS_HOST'] = 'algernon-1.cluster-cnd32dx4xing.us-east-1.rds.amazonaws.com'
         os.environ['RDS_DB_NAME'] = 'algernon'
+        os.environ['INDEX_TABLE_NAME'] = 'Indexes'
         results = handler(task_event, mock_context)
         assert results

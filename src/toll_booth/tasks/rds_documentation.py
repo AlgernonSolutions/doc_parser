@@ -1,10 +1,10 @@
-import json
 import os
 
+import boto3
 import rapidjson
 from algernon import rebuild_event
+from boto3.dynamodb.conditions import Key
 
-from toll_booth.obj.gql.gql_client import GqlClient
 from toll_booth.obj.rds import SqlDriver, DocumentationTextEntry
 
 
@@ -16,14 +16,23 @@ def _build_sql_driver():
     return driver
 
 
+def _retrieve_internal_id(identifier_stem, id_value, table_resource):
+    response = table_resource.query(
+        KeyConditionExpression=Key('identifier_stem').eq(identifier_stem) & Key('sid_value').eq(str(id_value)),
+        ProjectionExpression='internal_id'
+    )
+    for entry in response['Items']:
+        return entry['internal_id']
+
+
 def _resolve_internal_ids(identifier_stem, provider_id_value, patient_id_value):
-    gql_endpoint = os.environ['GRAPH_GQL_ENDPOINT']
-    client = GqlClient.from_gql_endpoint(gql_endpoint)
-    identifier_stem = identifier_stem.replace('"', '\\\"')
+    table_name = os.environ['INDEX_TABLE_NAME']
+    session = boto3.session.Session()
+    table = session.resource('dynamodb').Table(table_name)
     provider_stem = identifier_stem.replace('Encounter', 'Provider')
     patient_stem = identifier_stem.replace('Encounter', 'Patient')
-    provider_internal_id = client.get_internal_id(provider_stem, provider_id_value)
-    patient_internal_id = client.get_internal_id(patient_stem, patient_id_value)
+    provider_internal_id = _retrieve_internal_id(provider_stem, provider_id_value, table)
+    patient_internal_id = _retrieve_internal_id(patient_stem, patient_id_value, table)
     return provider_internal_id, patient_internal_id
 
 
