@@ -3,6 +3,9 @@ Transform:
 - AWS::Serverless-2016-10-31
 
 Parameters:
+  WorkerRoleArn:
+    Type: String
+    Description: the ARN of the assigned IAM role
   NeptuneSecurityGroupIds:
     Type: List<AWS::EC2::SecurityGroup::Id>
     Description: A collection of Security Group IDs capable of interacting with the Neptune Cluster
@@ -18,7 +21,7 @@ Resources:
       Runtime: python3.7
       Tracing: Active
       CodeUri: src/
-      Role: !ImportValue dev-worker-role-arn
+      Role: !Ref WorkerRoleArn
   VpcTask:
     Type: AWS::Serverless::Function
     Properties:
@@ -26,7 +29,7 @@ Resources:
       Runtime: python3.7
       Tracing: Active
       CodeUri: src/
-      Role: !ImportValue dev-worker-role-arn
+      Role: !Ref WorkerRoleArn
       VpcConfig:
         SecurityGroupIds: !Ref NeptuneSecurityGroupIds
         SubnetIds: !Ref NeptuneSubnetIds
