@@ -6,12 +6,6 @@ Parameters:
   WorkerRoleArn:
     Type: String
     Description: the ARN of the assigned IAM role
-  NeptuneSecurityGroupIds:
-    Type: List<AWS::EC2::SecurityGroup::Id>
-    Description: A collection of Security Group IDs capable of interacting with the Neptune Cluster
-  NeptuneSubnetIds:
-    Type: List<AWS::EC2::Subnet::Id>
-    Description: A collection of Subnet IDs which can interact with the Neptune Cluster
 
 Resources:
   Task:
