@@ -33,7 +33,7 @@ class IndexViolationException(Exception):
 
     @classmethod
     def from_integrity_error(cls, error):
-        error_msg = error.args[1]
+        error_msg = error.args[0]
         error_msg = error_msg.replace('Duplicate entry ', '')
         error_msg = error_msg.replace(' for key ', '!')
         error_msg = error_msg.replace("'", '')
@@ -147,7 +147,7 @@ class ApiDriver:
             params = documentation_text_entry.for_rds_insertion
             results = self._send(command, params)
         except ClientError as e:
-            if e.args[0] != 1062:
+            if e.response['Error']['Code'] != 'BadRequestException':
                 raise e
             raise IndexViolationException.from_integrity_error(e)
         return results
