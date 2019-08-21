@@ -6,7 +6,6 @@ from decimal import Decimal
 import boto3
 import rapidjson
 from algernon import rebuild_event
-from algernon.aws import lambda_logged
 
 
 class FireHoseEncoder(json.JSONEncoder):
@@ -33,6 +32,6 @@ def _send_to_fire_hose(stream_name, records):
 
 def fire_hose_documentation(**kwargs):
     extracted_data = kwargs['extracted_data']
-    stream_name = os.environ['S3_FIRE_HOSE_NAME']
+    stream_name = os.environ['FIRE_HOSE_NAME']
     extracted_data = rebuild_event(extracted_data)
     _send_to_fire_hose(stream_name, [extracted_data])
