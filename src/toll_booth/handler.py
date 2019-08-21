@@ -25,7 +25,8 @@ def handler(event, context):
         'ALGERNON_BUCKET_NAME',
         'RDS_SECRET_ARN',
         'RDS_CLUSTER_ARN',
-        'RDS_DB_NAME'
+        'RDS_DB_NAME',
+        'INDEX_TABLE_NAME'
     ]
     event = rebuild_event(event)
     _load_config(variable_names)
