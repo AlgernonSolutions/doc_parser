@@ -33,5 +33,7 @@ def _send_to_fire_hose(stream_name, records):
 def fire_hose_documentation(**kwargs):
     extracted_data = kwargs['extracted_data']
     stream_name = os.environ['FIRE_HOSE_NAME']
+    if isinstance(extracted_data, str):
+        extracted_data = rapidjson.loads(extracted_data)
     extracted_data = rebuild_event(extracted_data)
     _send_to_fire_hose(stream_name, [extracted_data])

@@ -15,5 +15,6 @@ class TestParsers:
         os.environ['INDEX_TABLE_NAME'] = 'Indexes'
         os.environ['RDS_SECRET_ARN'] = 'arn:aws:secretsmanager:us-east-1:322652498512:secret:rds-xudEmz'
         os.environ['RDS_CLUSTER_ARN'] = 'arn:aws:rds:us-east-1:322652498512:cluster:algernon'
+        os.environ['FIRE_HOSE_NAME'] = 'arn:aws:rds:us-east-1:322652498512:cluster:algernon'
         results = handler(task_event, mock_context)
         assert results
