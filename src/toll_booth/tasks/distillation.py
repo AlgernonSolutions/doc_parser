@@ -2,10 +2,10 @@ import uuid
 from datetime import datetime
 
 import bs4
-from algernon.aws import StoredData
 from algernon import ajson
+from algernon.aws import StoredData
 
-from toll_booth.tasks.retrieve_documentation import retrieve_documentation
+from toll_booth.tasks.aws_tasks import s3_tasks
 
 
 def _distill_strings(documentation):
@@ -13,8 +13,18 @@ def _distill_strings(documentation):
     return ' '.join([x for x in soup.strings])
 
 
-def distill_documentation(encounter_internal_id):
-    documentation_data = retrieve_documentation(encounter_internal_id)
+def _retrieve_documentation(encounter_vertex):
+    vertex_properties = encounter_vertex['vertex_properties']['stored_properties']
+    for stored_property in vertex_properties:
+        property_name = stored_property['property_name']
+        if property_name == 'documentation':
+            storage_uri = stored_property['storage_uri']
+            return s3_tasks.retrieve_s3_property(storage_uri)
+    raise RuntimeError(f'could not find documentation property on vertex: {encounter_vertex}')
+
+
+def distill_documentation(encounter_vertex):
+    documentation_data = _retrieve_documentation(encounter_vertex)
     id_source = documentation_data['id_source']
     documentation = documentation_data['documentation']
     encounter_id = documentation_data['encounter_id']
