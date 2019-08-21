@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 
 import bs4
+import rapidjson
 from algernon import ajson
 from algernon.aws import StoredData
 
@@ -24,6 +25,8 @@ def _retrieve_documentation(encounter_vertex):
 
 
 def distill_documentation(encounter_vertex):
+    if isinstance(encounter_vertex, str):
+        encounter_vertex = rapidjson.loads(encounter_vertex)
     documentation_data = _retrieve_documentation(encounter_vertex)
     id_source = documentation_data['id_source']
     documentation = documentation_data['documentation']
