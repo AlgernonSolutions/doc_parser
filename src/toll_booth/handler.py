@@ -19,7 +19,14 @@ def _load_config(variable_names):
 @lambda_logged
 def handler(event, context):
     logging.info(f'received a call to run a parser: {event}/{context}')
-    variable_names = ['GRAPH_GQL_ENDPOINT', 'S3_FIRE_HOSE_NAME']
+    variable_names = [
+        'GRAPH_GQL_ENDPOINT',
+        'FIRE_HOSE_NAME',
+        'ALGERNON_BUCKET_NAME',
+        'RDS_SECRET_ARN',
+        'RDS_CLUSTER_ARN',
+        'RDS_DB_NAME'
+    ]
     event = rebuild_event(event)
     _load_config(variable_names)
     parse_type = event['parse_type']

@@ -22,14 +22,3 @@ Resources:
       Tracing: Active
       CodeUri: src/
       Role: !Ref WorkerRoleArn
-  VpcTask:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: toll_booth.handler
-      Runtime: python3.7
-      Tracing: Active
-      CodeUri: src/
-      Role: !Ref WorkerRoleArn
-      VpcConfig:
-        SecurityGroupIds: !Ref NeptuneSecurityGroupIds
-        SubnetIds: !Ref NeptuneSubnetIds
