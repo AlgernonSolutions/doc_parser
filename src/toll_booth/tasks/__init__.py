@@ -2,4 +2,5 @@ from toll_booth.tasks.distillation import distill_documentation
 from toll_booth.tasks.parse_documentation import parse_documentation
 from toll_booth.tasks.fire_hose_documentation import fire_hose_documentation
 from toll_booth.tasks.rds_documentation import rds_documentation
+from toll_booth.tasks.es_documentation import es_documentation
 from toll_booth.tasks.finalize_documentation import finalize_documentation

@@ -3,3 +3,6 @@ jsonpath_rw
 moncrief
 lxml
 PyMySQL
+elasticsearch
+requests
+requests-aws4auth

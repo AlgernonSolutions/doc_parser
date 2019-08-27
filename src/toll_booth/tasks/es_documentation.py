@@ -6,12 +6,13 @@ import rapidjson
 from algernon import rebuild_event
 from boto3.dynamodb.conditions import Key
 
-from toll_booth.obj.rds import ApiDriver
 from toll_booth.obj.documentation import DocumentationTextEntry
+from toll_booth.obj.es import ElasticDriver
 
 
-def _build_sql_driver():
-    driver = ApiDriver.generate()
+def _build_es_driver() -> ElasticDriver:
+    es_host = os.environ['ELASTIC_HOST_NAME']
+    driver = ElasticDriver.generate(es_host)
     return driver
 
 
@@ -43,9 +44,9 @@ def _find_encounter_property(property_name, encounter_properties):
     raise KeyError(property_name)
 
 
-def rds_documentation(encounter, documentation_text, sql_driver=None):
-    if not sql_driver:
-        sql_driver = _build_sql_driver()
+def es_documentation(encounter, documentation_text, es_driver: ElasticDriver = None):
+    if not es_driver:
+        es_driver = _build_es_driver()
     documentation_text = rebuild_event(rapidjson.loads(documentation_text))
     logging.debug(f'after rebuilding, documentation_text is {documentation_text}')
     encounter_properties = encounter['vertex_properties']['local_properties']
@@ -67,6 +68,7 @@ def rds_documentation(encounter, documentation_text, sql_driver=None):
         'encounter_id_value': int(encounter['id_value']['property_value'])
     }
     text_entry = DocumentationTextEntry(**entry_kwargs)
-    logging.debug(f'going to push the created documentation entry: {entry_kwargs} to the database')
-    sql_driver.put_documentation(text_entry)
-    logging.debug(f'successfully pushed the documentation to the database')
+    logging.debug(f'going to push the created documentation entry: {entry_kwargs} to the elastic search cluster')
+    index_name = 'documentation'
+    es_driver.index_document(index_name, 'Documentation', encounter['internal_id'], text_entry.for_insertion)
+    logging.debug(f'successfully pushed the documentation to the elastic search cluster')

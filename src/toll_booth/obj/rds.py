@@ -7,6 +7,8 @@ from algernon.aws import Opossum
 from botocore.exceptions import ClientError
 from pymysql import connect, IntegrityError
 
+from toll_booth.obj.documentation import DocumentationTextEntry
+
 
 def _set_parameter_type(parameter):
     if isinstance(parameter, str):
@@ -41,80 +43,6 @@ class IndexViolationException(Exception):
         return cls(pieces[1], pieces[0])
 
 
-class DocumentationTextEntry:
-    def __init__(self,
-                 encounter_internal_id,
-                 encounter_type,
-                 id_source,
-                 documentation_text,
-                 provider_internal_id,
-                 patient_internal_id,
-                 provider_id_value,
-                 patient_id_value,
-                 encounter_id_value):
-        self._encounter_internal_id = encounter_internal_id
-        self._encounter_type = encounter_type
-        self._id_source = id_source
-        self._documentation_text = documentation_text
-        self._provider_internal_id = provider_internal_id
-        self._patient_internal_id = patient_internal_id
-        self._provider_id_value = provider_id_value
-        self._patient_id_value = patient_id_value
-        self._encounter_id_value = encounter_id_value
-
-    @property
-    def documentation_text(self):
-        return self._documentation_text
-
-    @property
-    def encounter_internal_id(self):
-        return self._encounter_internal_id
-
-    @property
-    def encounter_type(self):
-        return self._encounter_type
-
-    @property
-    def id_source(self):
-        return self._id_source
-
-    @property
-    def provider_internal_id(self):
-        return self._provider_internal_id
-
-    @property
-    def patient_internal_id(self):
-        return self._patient_internal_id
-
-    @property
-    def provider_id_value(self):
-        return self._provider_id_value
-
-    @property
-    def patient_id_value(self):
-        return self._patient_id_value
-
-    @property
-    def for_rds_insertion(self):
-        return {
-            'encounter_internal_id': self._encounter_internal_id,
-            'encounter_type': self._encounter_type,
-            'id_source': self._id_source,
-            'documentation_text': self._documentation_text,
-            'provider_internal_id': self._provider_internal_id,
-            'patient_internal_id': self._patient_internal_id,
-            'provider_id_value': self._provider_id_value,
-            'patient_id_value': self._patient_id_value,
-            'encounter_id_value': self._encounter_id_value
-        }
-
-    def __getitem__(self, item):
-        result = getattr(self, f'_{item}', None)
-        if result is None:
-            raise KeyError
-        return result
-
-
 class ApiDriver:
     def __init__(self, db_name, db_cluster_arn, secret_arn):
         self._db_name = db_name
@@ -144,7 +72,7 @@ class ApiDriver:
                   '(:encounter_internal_id, :encounter_type, :id_source, :documentation_text, :provider_internal_id, ' \
                   ':patient_internal_id, :provider_id_value, :patient_id_value, :encounter_id_value)'
         try:
-            params = documentation_text_entry.for_rds_insertion
+            params = documentation_text_entry.for_insertion
             results = self._send(command, params)
         except ClientError as e:
             if e.response['Error']['Code'] != 'BadRequestException':
@@ -227,7 +155,7 @@ class SqlDriver:
                   '%(provider_internal_id)s, %(patient_internal_id)s, %(provider_id_value)s, %(patient_id_value)s, ' \
                   '%(encounter_id_value)s)'
         try:
-            params = documentation_text_entry.for_rds_insertion
+            params = documentation_text_entry.for_insertion
             results = self._cursor.execute(command, params)
             self._connection.commit()
         except IntegrityError as e:
