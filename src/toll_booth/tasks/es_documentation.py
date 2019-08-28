@@ -11,7 +11,7 @@ from toll_booth.obj.es import ElasticDriver
 
 
 def _build_es_driver() -> ElasticDriver:
-    es_host = os.environ['ELASTIC_HOST_NAME']
+    es_host = os.environ['ELASTIC_HOST']
     driver = ElasticDriver.generate(es_host)
     return driver
 
@@ -70,5 +70,5 @@ def es_documentation(encounter, documentation_text, es_driver: ElasticDriver = N
     text_entry = DocumentationTextEntry(**entry_kwargs)
     logging.debug(f'going to push the created documentation entry: {entry_kwargs} to the elastic search cluster')
     index_name = 'documentation'
-    es_driver.index_document(index_name, 'Documentation', encounter['internal_id'], text_entry.for_insertion)
+    results = es_driver.index_document(index_name, '_doc', encounter['internal_id'], text_entry.for_insertion)
     logging.debug(f'successfully pushed the documentation to the elastic search cluster')

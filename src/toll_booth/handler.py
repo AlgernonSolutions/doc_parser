@@ -27,7 +27,8 @@ def handler(event, context):
         'RDS_CLUSTER_ARN',
         'RDS_DB_NAME',
         'INDEX_TABLE_NAME',
-        'PROGRESS_TABLE_NAME'
+        'PROGRESS_TABLE_NAME',
+        'ELASTIC_HOST'
     ]
     event = rebuild_event(event)
     _load_config(variable_names)

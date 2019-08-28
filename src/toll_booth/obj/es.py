@@ -29,7 +29,7 @@ class ElasticDriver:
         )
 
     def index_document(self, index_name, document_type, document_id, document):
-        self.es_client.index(index=index_name, doc_type=document_type, id=document_id, body=document)
+        return self.es_client.index(index=index_name, doc_type=document_type, id=document_id, body=document)
 
     def get_document(self, index_name, document_type, document_id):
         return self.es_client.get(index=index_name, doc_type=document_type, id=document_id)
