@@ -12,10 +12,13 @@ class ElasticDriver:
 
     @classmethod
     def generate(cls, es_host):
-        service = 'es'
-        region = os.environ.get('AWS_REGION', 'us-east-1')
         credentials = boto3.Session().get_credentials()
-        aws_auth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service)
+        region = os.environ.get('AWS_REGION', 'us-east-1')
+        if os.getenv('AWS_SESSION_TOKEN', None):
+            session_token = os.environ['AWS_SESSION_TOKEN']
+            auth = AWS4Auth(credentials.access_key, credentials.secret_key, region, 'es', session_token=session_token)
+            return cls(es_host, auth)
+        aws_auth = AWS4Auth(credentials.access_key, credentials.secret_key, region, 'es')
         return cls(es_host, aws_auth)
 
     @property
@@ -29,7 +32,10 @@ class ElasticDriver:
         )
 
     def index_document(self, index_name, document_type, document_id, document):
-        return self.es_client.index(index=index_name, doc_type=document_type, id=document_id, body=document)
+        return self.es_client.create(index=index_name, doc_type=document_type, id=document_id, body=document)
 
     def get_document(self, index_name, document_type, document_id):
         return self.es_client.get(index=index_name, doc_type=document_type, id=document_id)
+
+    def search(self, index_name, query_body):
+        return self.es_client.search(index_name, body={'query': query_body})
